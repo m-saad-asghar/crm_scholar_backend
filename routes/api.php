@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProductController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,3 +21,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::get('/test', function () {
     return "This is Test API for Scholer CRM";
 });
+Route::post('/add_new_product', [ProductController::class, 'add_new_product']);
+Route::post('/get_products', [ProductController::class, 'get_products']);
