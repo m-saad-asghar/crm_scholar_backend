@@ -27,7 +27,9 @@ class ProductController extends Controller
         ]);
         if ($result == 1 || $result == 0){
             $products = DB::table("product_tbl")
+                ->leftJoin("category_tbl", "category_tbl.id", "product_tbl.category")
                 ->orderBy("id", "DESC")
+                ->select("product_tbl.*", "category_tbl.category as category_name")
                 ->get();
             return response()->json([
                 "success" => 1,
@@ -41,10 +43,36 @@ class ProductController extends Controller
     }
 
     public function get_products(Request $request){
-
+    $searchTerm = $request->search_term;
 
         $products = DB::table("product_tbl")
+            ->leftJoin("category_tbl", "category_tbl.id", "product_tbl.category")
+            ->leftJoin("subject_tbl", "subject_tbl.id", "product_tbl.subject")
+            ->leftJoin("book_for_board_tbl", "book_for_board_tbl.id", "product_tbl.book_for")
+            ->leftJoin("sheet_size_tbl as book_sheet", "book_sheet.id", "product_tbl.book_sheet_size")
+            ->leftJoin("sheet_size_tbl as title_sheet", "title_sheet.id", "product_tbl.title_sheet_size")
             ->orderBy("id", "DESC")
+            ->where(function ($query) use ($request) {
+                if($request->search_term !== ""){
+                    $query->where('product_tbl.product_code', 'LIKE', '%' . $request->search_term . '%')
+                        ->orWhere('product_tbl.product_name', 'LIKE', '%' . $request->search_term . '%')
+                        ->orWhere('product_tbl.face_price', 'LIKE', '%' . $request->search_term . '%')
+                        ->orWhere('product_tbl.weight', 'LIKE', '%' . $request->search_term . '%')
+                        ->orWhere('book_sheet.sheet', 'LIKE', '%' . $request->search_term . '%')
+                        ->orWhere('title_sheet.sheet', 'LIKE', '%' . $request->search_term . '%')
+                        ->orWhere('category_tbl.category', 'LIKE', '%' . $request->search_term . '%')
+                        ->orWhere('subject_tbl.subject', 'LIKE', '%' . $request->search_term . '%')
+                        ->orWhere('product_tbl.product_sname', 'LIKE', '%' . $request->search_term . '%');
+                }
+            })
+            ->select(
+                "product_tbl.*",
+                "category_tbl.category as category_name",
+                "subject_tbl.subject as subject_name",
+                "book_for_board_tbl.name as board_name",
+                "book_sheet.sheet as book_sheet_size_label",
+                "title_sheet.sheet as title_sheet_size_label"
+            )
             ->get();
 
         return response()->json([
@@ -136,7 +164,9 @@ class ProductController extends Controller
         ]);
         if ($result == 1 || $result == 0){
             $products = DB::table("product_tbl")
+                ->leftJoin("category_tbl", "category_tbl.id", "product_tbl.category")
                 ->orderBy("id", "DESC")
+                ->select("product_tbl.*", "category_tbl.category as category_name")
                 ->get();
             return response()->json([
                 "success" => 1,
