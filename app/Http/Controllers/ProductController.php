@@ -27,7 +27,6 @@ class ProductController extends Controller
         ]);
         if ($result == 1 || $result == 0){
             $products = DB::table("product_tbl")
-                ->where("active", 1)
                 ->orderBy("id", "DESC")
                 ->get();
             return response()->json([
@@ -45,7 +44,6 @@ class ProductController extends Controller
         
         
         $products = DB::table("product_tbl")
-            ->where("active", 1)
             ->orderBy("id", "DESC")
             ->get();
             
@@ -54,6 +52,7 @@ class ProductController extends Controller
             "products" => $products
         ]);
     }
+<<<<<<< Updated upstream
 
     public function get_category(Request $request){
         $category = DB::table("category_tbl")
@@ -106,11 +105,36 @@ class ProductController extends Controller
         ]);
         if ($result == 1 || $result == 0){
             $categories = DB::table("category_tbl")
+=======
+    public function update_product(Request $request, $id){
+        $result = DB::table("product_tbl")->where("id", $id)->update([
+            "product_code" => $request->product_bar_code,
+            "product_sname" => $request->product_short_name,
+            "product_name" => $request->product_name,
+            "face_price" => $request->face_price,
+            "pages" => $request->pages,
+            "inner_pages" => $request->inner_pages,
+            "rule_pages" => $request->rule_pages,
+            "amount_of_farmay" => $request->farmay,
+            "weight" => $request->book_weight,
+            "subject" => $request->subject,
+            "book_for" => $request->book_for,
+            "book_sheet_size" => $request->sheet_size,
+            "title_sheet_size" => $request->title_sheet_size,
+            "category" => $request->category,
+        ]);
+        if ($result == 1 || $result == 0){
+            $products = DB::table("product_tbl")
+>>>>>>> Stashed changes
                 ->orderBy("id", "DESC")
                 ->get();
             return response()->json([
                 "success" => 1,
+<<<<<<< Updated upstream
                 "categories" => $categories
+=======
+                "products" => $products
+>>>>>>> Stashed changes
             ]);
         }else{
             return response()->json([
@@ -118,6 +142,7 @@ class ProductController extends Controller
             ]);
         }
     }
+<<<<<<< Updated upstream
 
     public function add_new_subject(Request $request){
         $result = DB::table("subject_tbl")->insert([
@@ -130,6 +155,15 @@ class ProductController extends Controller
             return response()->json([
                 "success" => 1,
                 "subjects" => $subjects
+=======
+    public function change_status_product(Request $request, $id){
+        $result = DB::table("product_tbl")->where("id", $id)->update([
+            "active" => ($request->status == true) ? 1 : 0,
+        ]);
+        if ($result == 1){
+            return response()->json([
+                "success" => 1
+>>>>>>> Stashed changes
             ]);
         }else{
             return response()->json([
@@ -137,5 +171,8 @@ class ProductController extends Controller
             ]);
         }
     }
+<<<<<<< Updated upstream
     
+=======
+>>>>>>> Stashed changes
 }
