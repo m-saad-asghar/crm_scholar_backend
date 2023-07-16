@@ -81,6 +81,18 @@ class ProductController extends Controller
         ]);
     }
 
+    public function get_p_f_plates(Request $request){
+
+        $products = DB::table("product_for_plates_view")
+            ->orderBy("id", "DESC")
+            ->get();
+
+        return response()->json([
+            "success" => true,
+            "products" => $products
+        ]);
+    }
+
     public function get_category(Request $request){
         $category = DB::table("category_tbl")
         ->orderBy("id", "DESC")
