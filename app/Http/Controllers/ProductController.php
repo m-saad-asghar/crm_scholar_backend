@@ -55,87 +55,26 @@ class ProductController extends Controller
         ]);
     }
 
-    public function get_category(Request $request){
-        $category = DB::table("category_tbl")
+    public function get_p_f_plates(Request $request){
+
+        $products = DB::table("product_for_plates_view")
         ->orderBy("id", "DESC")
-        ->get();
+            ->get();
 
-        return response()->json([
-            "Success" => true,
-            "category" => $category
-        ]);
-    }
-
-    public function get_subjects(Request $request){
-        $subject = DB::table("subject_tbl")
-        ->orderBy("id", "DESC")
-        ->get();
-
-        return response()->json([
-            "Success" => true,
-            "subject" => $subject
-        ]);
-    }
-
-    public function get_sheet_sizes(Request $request){
-        $sheets = DB::table("sheet_size_tbl")
-        ->orderBy("id", "DESC")
-        ->get();
-
-        return response()->json([
-            "Success" => true,
-            "sheets" => $sheets
-        ]);
-    }
-
-    public function get_book_for_board(Request $request){
-        $boards = DB::table("book_for_board_tbl")
-        ->orderBy("id", "DESC")
-        ->get();
-
-        return response()->json([
-            "Success" => true,
-            "boards" => $boards
-        ]);
-
-    }
-
-    public function add_new_category(Request $request){
-        $result = DB::table("category_tbl")->insert([
-            "category" => $request -> category,
-        ]);
-        if ($result == 1 || $result == 0){
-            $categories = DB::table("category_tbl")
-                ->orderBy("id", "DESC")
-                ->get();
             return response()->json([
-                "success" => 1,
-                "categories" => $categories
+                "success" => true,
+                "products" => $products
             ]);
-        }else{
-            return response()->json([
-                "success" => 0
-            ]);
-        }
     }
 
-    public function add_new_subject(Request $request){
-        $result = DB::table("subject_tbl")->insert([
-            "subject" => $request -> subject,
-        ]);
-        if ($result == 1 || $result == 0){
-            $subjects = DB::table("subject_tbl")
-                ->orderBy("id", "DESC")
-                ->get();
-            return response()->json([
-                "success" => 1,
-                "subjects" => $subjects
-            ]);
-        }else{
-            return response()->json([
-                "success" => 0
-            ]);
-        }
-    }
+   
+
+    
+
+    
+
+    
+
+   
     
 }
