@@ -23,7 +23,6 @@ Route::get('/test', function () {
 });
 Route::post('/add_new_product', [ProductController::class, 'add_new_product']);
 Route::post('/get_products', [ProductController::class, 'get_products']);
-<<<<<<< Updated upstream
 Route::post('/get_category', [ProductController::class, 'get_category']);
 Route::post('/get_subjects', [ProductController::class, 'get_subjects']);
 Route::post('/get_sheet_sizes', [ProductController::class, 'get_sheet_sizes']);
@@ -34,8 +33,5 @@ Route::post('/add_new_category', [ProductController::class, 'add_new_category'])
 
 // Routes for Subject Form
 Route::post('/add_new_subject', [ProductController::class, 'add_new_subject']);
-
-=======
 Route::put('/update_product/{id}', [ProductController::class, 'update_product']);
 Route::put('/change_status_product/{id}', [ProductController::class, 'change_status_product']);
->>>>>>> Stashed changes
