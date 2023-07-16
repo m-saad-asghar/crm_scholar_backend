@@ -29,7 +29,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 Route::get('/test', function () {
-    return "This is Test API for Scholer CRM";
+    return "This is Test API for Scholar CRM";
 });
 
 // Routes for Product Form
@@ -50,6 +50,8 @@ Route::post('/add_new_category', [CategoryController::class, 'add_new_category']
 Route::post('/get_category', [CategoryController::class, 'get_category']);
 
 // Routes for Subject Form
+Route::put('/update_product/{id}', [ProductController::class, 'update_product']);
+Route::put('/change_status_product/{id}', [ProductController::class, 'change_status_product']);
 Route::post('/add_new_subject', [SubjectController::class, 'add_new_subject']);
 Route::post('/get_subjects', [SubjectController::class, 'get_subjects']);
 
