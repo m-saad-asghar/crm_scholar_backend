@@ -23,3 +23,14 @@ Route::get('/test', function () {
 });
 Route::post('/add_new_product', [ProductController::class, 'add_new_product']);
 Route::post('/get_products', [ProductController::class, 'get_products']);
+Route::post('/get_category', [ProductController::class, 'get_category']);
+Route::post('/get_subjects', [ProductController::class, 'get_subjects']);
+Route::post('/get_sheet_sizes', [ProductController::class, 'get_sheet_sizes']);
+Route::post('/get_book_for_board', [ProductController::class, 'get_book_for_board']);
+
+// Routes for Category Form
+Route::post('/add_new_category', [ProductController::class, 'add_new_category']);
+
+// Routes for Subject Form
+Route::post('/add_new_subject', [ProductController::class, 'add_new_subject']);
+
