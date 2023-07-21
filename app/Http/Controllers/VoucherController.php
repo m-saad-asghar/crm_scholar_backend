@@ -97,7 +97,7 @@ $count = $count + 1;
 $voucher = "PV-" . $currentYear . str_pad($currentMonth, 2, '0', STR_PAD_LEFT) . str_pad($count, 4, '0', STR_PAD_LEFT);
 
 DB::beginTransaction();
-//try{
+try{
 
     $result = DB::table("voucher_tbl")->insert([
         "voucher_no" => $voucher,
@@ -156,8 +156,8 @@ DB::beginTransaction();
         "voucher" => $voucher,
         
     ]);
-//}
-/*catch(Exception $e){
+}
+catch(Exception $e){
 DB::rollback();
 
 return response()->json([
@@ -166,7 +166,7 @@ return response()->json([
     
 ]);
 }
-*/
+
         
     }
 

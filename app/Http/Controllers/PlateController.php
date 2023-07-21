@@ -59,7 +59,18 @@ class PlateController extends Controller{
             ]);
         
     }
+    public function get_plate_with_id(Request $request){
+        $plates = DB::table("product_tbl")
+        ->select('id', 'product_name as plate')
+        ->where('product_type', '=', 3)
+        ->orderBy('id', 'DESC')
+        ->get();
 
+        return response()->json([
+            "success" => true,
+            "plates" => $plates
+        ]);
+    }
 }
 
 

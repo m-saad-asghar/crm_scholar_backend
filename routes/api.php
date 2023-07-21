@@ -13,6 +13,7 @@ use App\Http\Controllers\PlateController;
 use App\Http\Controllers\GodownController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\VoucherController;
+use App\Http\Controllers\BatchController;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,6 +37,9 @@ Route::get('/test', function () {
 Route::post('/add_new_product', [ProductController::class, 'add_new_product']);
 Route::post('/get_products', [ProductController::class, 'get_products']);
 Route::post('/get_p_f_plates', [ProductController::class, 'get_p_f_plates']);
+Route::put('/update_product/{id}', [ProductController::class, 'update_product']);
+Route::put('/change_status_product/{id}', [ProductController::class, 'change_status_product']);
+Route::post('/get_products_for_batch', [ProductController::class, 'get_products_for_batch']);
 
 // Routes for Sheet Size
 Route::post('/add_new_sheet_size', [SheetSizeController::class, 'add_new_sheet_size']);
@@ -49,23 +53,27 @@ Route::post('/add_new_book_for_board', [ForBoardController::class, 'add_new_book
 Route::post('/add_new_category', [CategoryController::class, 'add_new_category']);
 Route::post('/get_category', [CategoryController::class, 'get_category']);
 
+
+
 // Routes for Subject Form
-Route::put('/update_product/{id}', [ProductController::class, 'update_product']);
-Route::put('/change_status_product/{id}', [ProductController::class, 'change_status_product']);
 Route::post('/add_new_subject', [SubjectController::class, 'add_new_subject']);
 Route::post('/get_subjects', [SubjectController::class, 'get_subjects']);
 
 // Routes for Paper
 Route::post('/add_new_paper', [PaperController::class, 'add_new_paper']);
 Route::post('/get_papers', [PaperController::class, 'get_papers']);
+Route::post('/get_paper_with_id/{id}', [PaperController::class, 'get_paper_with_id']);
+Route::post('/get_paper_with_type', [PaperController::class, 'get_paper_with_type']);
 
 // Routes for Paper Type
 Route::post('/add_new_paper_type', [PaperTypeController::class, 'add_new_paper_type']);
 Route::post('/get_paper_types', [PaperTypeController::class, 'get_paper_types']);
 
+
 // Routes for Plates
 Route::post('/add_new_plate', [PlateController::class, 'add_new_plate']);
 Route::post('/get_plates', [PlateController::class, 'get_plates']);
+Route::post('/get_plate_with_id', [PlateController::class, 'get_plate_with_id']);
 
 // Routes for Godown
 Route::post('/add_new_godown', [GodownController::class, 'add_new_godown']);
@@ -80,4 +88,9 @@ Route::post('/get_p_p_vendors', [VendorController::class, 'get_p_p_vendors']);
 // Routes for Voucher
 Route::post('/add_new_voucher', [VoucherController::class, 'add_new_voucher']);
 
+// Route for Batch
+Route::post('/get_processes', [BatchController::class, 'get_processes']);
+Route::post('/add_new_batch', [BatchController::class, 'add_new_batch']);
+Route::post('/get_batches_against_processes/{id}', [BatchController::class, 'get_batches_against_processes']);
+Route::post('/get_batch_data_for_press/{batch}/{process}', [BatchController::class, 'get_batch_data_for_press']);
 
