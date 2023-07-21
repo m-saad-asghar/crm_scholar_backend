@@ -47,6 +47,7 @@ public function add_new_paper_type(Request $request){
 }
     public function get_paper_types(Request $request){
         $paper_types = DB::table("product_child_type_tbl")
+        ->select("id", "child_type as name")
         ->where("parent_type", "=", 2)
             ->orderBy("id", "DESC")
             ->get();

@@ -16,7 +16,7 @@ class PaperController extends Controller{
             "pages" => 0,
             "inner_pages" => 0,
             "rule_pages" => 0,
-            "amount_of_farmay" => 0,
+            "farmay" => 0,
             "weight" => $request->weight,
             "subject" => 0,
             "book_for" => 0,
@@ -54,6 +54,32 @@ class PaperController extends Controller{
             ->where('product_tbl.product_type', '=', 2)     
             ->orderBy("id", "DESC")
                 ->get();
+
+        return response()->json([
+            "success" => true,
+            "papers" => $papers
+        ]);
+    }
+    public function get_paper_with_id(Request $request, $id){
+        $papers = DB::table("product_tbl")
+        ->select('id', 'product_name as paper')
+        ->where('product_type', '=', 2)
+        ->where('child_type', '=', $id)
+        ->orderBy('id', 'DESC')
+        ->get();
+
+        return response()->json([
+            "success" => true,
+            "papers" => $papers
+        ]);
+    }
+    public function get_paper_with_type(Request $request){
+        $papers = DB::table("product_tbl")
+        ->join('product_child_type_tbl', 'product_tbl.child_type', '=', 'product_child_type_tbl.id')
+        ->select('product_tbl.id', DB::raw('CONCAT(product_tbl.product_name, "-", product_child_type_tbl.child_type) AS name'))
+        ->where('product_tbl.product_type', '=', 2)
+        ->orderBy('product_tbl.id', 'DESC')
+        ->get();
 
         return response()->json([
             "success" => true,
