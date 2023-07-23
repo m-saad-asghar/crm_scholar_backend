@@ -139,18 +139,31 @@ return $batchNo;
     }
 
     public function get_batches_against_processes(Request $request, $id){
-        $result = DB::table('batch_tbl')
+        /*$result = DB::table('batch_tbl')
         ->join('batch_history_tbl as bht', 'batch_tbl.batch_no', '=', 'bht.batch_no')
         ->select('batch_tbl.batch_no')
         ->where('batch_tbl.status', '=', 'open')
+        ->where('bht.voucher_no', 'IS', NULL)
         ->where('bht.process', '=', $id)
         ->orderBy('batch_tbl.id')
         ->get();
 
+        $query = $result->toSql();
+*/
+$result = DB::table("batch_tbl")
+->join("batch_history_tbl as bht", function($join){
+	$join->on("batch_tbl.batch_no", "=", "bht.batch_no");
+})
+->select("batch_tbl.batch_no")
+->where("batch_tbl.status", "=", 'open')
+->where("bht.process", "=", $id)
+->whereNull("bht.voucher_no")
+->get();
+
         return response()->json([
             'success' => 1,
-            'batches'=> $result
-
+            'batches'=> $result,
+            
         ]);
     }
 
@@ -170,6 +183,73 @@ return $batchNo;
     ->where('bht.batch_no', '=', $batch)
     ->where('bht.process', '=', $process)
     ->get();
+if($result){
+    return response()->json([
+        'success' => 1,
+        'batchData' => $result
+    ]);
+}
+else{
+    return response()->json([
+        'success' => 0,
+        
+    ]);
+}
+        
+
+    }
+
+    public function get_batch_data_for_lamination(Request $request, $batch, $process, $recfrom){
+       /* $result = DB::table('batch_tbl as bt')
+    ->join('product_tbl as pt', 'bt.for_product', '=', 'pt.id')
+    ->join('batch_history_tbl as bht', 'bt.batch_no', '=', 'bht.batch_no')
+    ->select(
+        'pt.product_name as productName',
+        'bt.for_product as productID',        
+        'bht.order_qty as order',        
+    )
+    ->where('bht.batch_no', '=', $batch)
+    ->where('bht.process', '=', $process)
+    ->get();
+    
+
+   $result = DB::table("batch_tbl as bt")
+->join("product_tbl as pt", function($join){
+	$join->on("bt.for_product", "=", "pt.id");
+})
+->join("batch_history_tbl as bht", function($join){
+	$join->on("bt.batch_no", "=", "bht.batch_no");
+})
+->select("pt.product_name as productname", "bt.for_product as productid", 
+"bht.order_qty as 'order'", "(select v_t.name from batch_history_tbl bht1 
+left join voucher_tbl vt1 on bht1.voucher_no = vt1.voucher_no 
+left join vendor_tbl v_t on vt1.account_code = v_t.code 
+where bht1.batch_no =", $batch, "and bht1.process = 1) as 'received from'")
+->where("bht.batch_no", "=", $batch)
+->where("bht.process", "=", $process)
+->get();
+*/
+$result = DB::select("
+SELECT 
+    pt.product_name AS productName,
+    bt.for_product AS productID,
+    bht.order_qty AS 'order',
+    (select v_t.name from batch_history_tbl bht1 left join voucher_tbl vt1 on bht1.voucher_no = 
+    vt1.voucher_no left join vendor_tbl v_t on vt1.account_code = v_t.code
+    where bht1.batch_no = ? and bht1.process = ?) as 'Received from',
+    (select vt1.account_code from batch_history_tbl bht1 left join voucher_tbl vt1 
+    on bht1.voucher_no = vt1.voucher_no 
+    where bht1.batch_no = ? and bht1.process = ?) as 'Received from ID'
+FROM batch_tbl AS bt
+JOIN product_tbl AS pt ON bt.for_product = pt.id
+JOIN batch_history_tbl AS bht ON bt.batch_no = bht.batch_no
+WHERE bht.batch_no = ?
+  AND bht.process = ?
+", [$batch, $recfrom, $batch, $recfrom, $batch, $process]);
+
+
+
+
 if($result){
     return response()->json([
         'success' => 1,

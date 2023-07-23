@@ -14,6 +14,8 @@ use App\Http\Controllers\GodownController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\BatchController;
+use App\Http\Controllers\POPressController;
+use App\Http\Controllers\POLaminationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -84,6 +86,8 @@ Route::post('/add_new_vendor', [VendorController::class, 'add_new_vendor']);
 Route::post('/get_vendors', [VendorController::class, 'get_vendors']);
 Route::post('/get_vendor_types', [VendorController::class, 'get_vendor_types']);
 Route::post('/get_p_p_vendors', [VendorController::class, 'get_p_p_vendors']);
+Route::post('/get_press_vendors', [VendorController::class, 'get_press_vendors']);
+Route::post('/get_lamination_vendors', [VendorController::class, 'get_lamination_vendors']);
 
 // Routes for Voucher
 Route::post('/add_new_voucher', [VoucherController::class, 'add_new_voucher']);
@@ -93,4 +97,10 @@ Route::post('/get_processes', [BatchController::class, 'get_processes']);
 Route::post('/add_new_batch', [BatchController::class, 'add_new_batch']);
 Route::post('/get_batches_against_processes/{id}', [BatchController::class, 'get_batches_against_processes']);
 Route::post('/get_batch_data_for_press/{batch}/{process}', [BatchController::class, 'get_batch_data_for_press']);
+Route::post('/get_batch_data_for_lamination/{batch}/{process}/{recfrom}', [BatchController::class, 'get_batch_data_for_lamination']);
 
+// Routes for PO Press
+Route::post('/add_new_po_press', [POPressController::class, 'add_new_po_press']);
+
+// Routes for PO Lamination
+Route::post('/add_new_po_lamination', [POLaminationController::class, 'add_new_po_lamination']);
