@@ -28,8 +28,19 @@ class ProductController extends Controller
         if ($result == 1 || $result == 0){
             $products = DB::table("product_tbl")
                 ->leftJoin("category_tbl", "category_tbl.id", "product_tbl.category")
+                ->leftJoin("subject_tbl", "subject_tbl.id", "product_tbl.subject")
+                ->leftJoin("book_for_board_tbl", "book_for_board_tbl.id", "product_tbl.book_for")
+                ->leftJoin("sheet_size_tbl as book_sheet", "book_sheet.id", "product_tbl.book_sheet_size")
+                ->leftJoin("sheet_size_tbl as title_sheet", "title_sheet.id", "product_tbl.title_sheet_size")
                 ->orderBy("id", "DESC")
-                ->select("product_tbl.*", "category_tbl.category as category_name")
+                ->select(
+                    "product_tbl.*",
+                    "category_tbl.category as category_name",
+                    "subject_tbl.subject as subject_name",
+                    "book_for_board_tbl.name as board_name",
+                    "book_sheet.sheet as book_sheet_size_label",
+                    "title_sheet.sheet as title_sheet_size_label"
+                )
                 ->get();
             return response()->json([
                 "success" => 1,
@@ -95,10 +106,10 @@ class ProductController extends Controller
         ]);
     }
 
-   
-   
 
-    
+
+
+
     public function update_product(Request $request, $id){
         $result = DB::table("product_tbl")->where("id", $id)->update([
             "product_code" => $request->product_bar_code,
@@ -119,8 +130,19 @@ class ProductController extends Controller
         if ($result == 1 || $result == 0){
             $products = DB::table("product_tbl")
                 ->leftJoin("category_tbl", "category_tbl.id", "product_tbl.category")
+                ->leftJoin("subject_tbl", "subject_tbl.id", "product_tbl.subject")
+                ->leftJoin("book_for_board_tbl", "book_for_board_tbl.id", "product_tbl.book_for")
+                ->leftJoin("sheet_size_tbl as book_sheet", "book_sheet.id", "product_tbl.book_sheet_size")
+                ->leftJoin("sheet_size_tbl as title_sheet", "title_sheet.id", "product_tbl.title_sheet_size")
                 ->orderBy("id", "DESC")
-                ->select("product_tbl.*", "category_tbl.category as category_name")
+                ->select(
+                    "product_tbl.*",
+                    "category_tbl.category as category_name",
+                    "subject_tbl.subject as subject_name",
+                    "book_for_board_tbl.name as board_name",
+                    "book_sheet.sheet as book_sheet_size_label",
+                    "title_sheet.sheet as title_sheet_size_label"
+                )
                 ->get();
             return response()->json([
                 "success" => 1,
@@ -133,7 +155,7 @@ class ProductController extends Controller
         }
     }
 
-   
+
 
     public function change_status_product(Request $request, $id){
         $result = DB::table("product_tbl")->where("id", $id)->update([
@@ -152,8 +174,8 @@ class ProductController extends Controller
 
     public function get_products_for_batch(Request $request){
         $result = DB::table('product_tbl')
-        ->select('product_tbl.id', 'product_name as name', 'pages', 'inner_pages', 'rule_pages', 
-        'sheet_tbl.sheet', 'sheet_tbl.portion as s_portion', 'sheet_tbl.length as s_length', 
+        ->select('product_tbl.id', 'product_name as name', 'pages', 'inner_pages', 'rule_pages',
+        'sheet_tbl.sheet', 'sheet_tbl.portion as s_portion', 'sheet_tbl.length as s_length',
         'sheet_tbl.width as s_width', 'title_tbl.sheet as title', 'title_tbl.portion as t_portion',
         'title_tbl.length as t_length', 'title_tbl.width as t_width', 'farmay')
         ->leftjoin('sheet_size_tbl as sheet_tbl', 'sheet_tbl.id', '=', 'product_tbl.book_sheet_size')
