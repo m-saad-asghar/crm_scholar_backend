@@ -121,6 +121,16 @@ $acode = "02-01-" . str_pad($code, 3, '0', STR_PAD_LEFT);
             "vendors" => $vendors
         ]); 
     }
+    public function get_binder_vendors(Request $request){
+        $vendors = DB::table('binder_vendor_view')
+        ->orderBy("code", "DESC")
+        ->get();
+
+        return response()->json([
+            "success" => true,
+            "vendors" => $vendors
+        ]); 
+    }
     public function get_vendor_types(Request $request){
         
         $vendor_types = DB::table("vendor_type_tbl")
