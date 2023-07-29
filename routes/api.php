@@ -88,9 +88,13 @@ Route::post('/get_vendor_types', [VendorController::class, 'get_vendor_types']);
 Route::post('/get_p_p_vendors', [VendorController::class, 'get_p_p_vendors']);
 Route::post('/get_press_vendors', [VendorController::class, 'get_press_vendors']);
 Route::post('/get_lamination_vendors', [VendorController::class, 'get_lamination_vendors']);
+Route::post('/get_binder_vendors', [VendorController::class, 'get_binder_vendors']);
 
 // Routes for Voucher
 Route::post('/add_new_voucher', [VoucherController::class, 'add_new_voucher']);
+Route::post('/get_processes_of_vendor_for_pv/{vid}', [VoucherController::class, 'get_processes_of_vendor_for_pv']);
+Route::post('/add_new_voucher_press', [VoucherController::class, 'add_new_voucher_press']);
+Route::post('/add_new_voucher_lamination', [VoucherController::class, 'add_new_voucher_lamination']);
 
 // Route for Batch
 Route::post('/get_processes', [BatchController::class, 'get_processes']);
@@ -98,9 +102,22 @@ Route::post('/add_new_batch', [BatchController::class, 'add_new_batch']);
 Route::post('/get_batches_against_processes/{id}', [BatchController::class, 'get_batches_against_processes']);
 Route::post('/get_batch_data_for_press/{batch}/{process}', [BatchController::class, 'get_batch_data_for_press']);
 Route::post('/get_batch_data_for_lamination/{batch}/{process}/{recfrom}', [BatchController::class, 'get_batch_data_for_lamination']);
+Route::post('/get_batch_data_for_binding/{batch}/{process}', [BatchController::class, 'get_batch_data_for_binding']);
+Route::post('/get_batches_for_product_received/{vid}', [BatchController::class, 'get_batches_for_product_received']);
+Route::post('/get_batch_data_for_book_received/{batch}', [BatchController::class, 'get_batch_data_for_book_received']);
+Route::post('/get_batches_for_pv_against_vendor/{process}/{vid}', [BatchController::class, 'get_batches_for_pv_against_vendor']);
+Route::post('/get_batch_data_for_press_pv/{batch}/{process}', [BatchController::class, 'get_batch_data_for_press_pv']);
+Route::post('/get_batch_data_for_binder_pv/{batch}/{process}', [BatchController::class, 'get_batch_data_for_binder_pv']);
+
 
 // Routes for PO Press
 Route::post('/add_new_po_press', [POPressController::class, 'add_new_po_press']);
 
 // Routes for PO Lamination
 Route::post('/add_new_po_lamination', [POLaminationController::class, 'add_new_po_lamination']);
+
+// Routes for PO Binding
+Route::post('/add_new_po_binding', [POBinderController::class, 'add_new_po_binding']);
+
+// Routes Book Receipt
+Route::post('/add_new_book_received', [BookReceiptController::class, 'add_new_book_received']);
