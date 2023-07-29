@@ -5,7 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Date;
 
-class POPressController extends Controller{
+class POLaminationController extends Controller{
 
     public function generateVoucher(){
         $currentDate = Date::now();
@@ -24,7 +24,7 @@ $voucher = "PO-" . $currentYear . str_pad($currentMonth, 2, '0', STR_PAD_LEFT) .
 return $voucher;
     }
 
-    public function add_new_po_press(Request $request){
+    public function add_new_po_lamination(Request $request){
        $Voucher = $this -> generateVoucher();
        DB::beginTransaction();
 try{
@@ -53,33 +53,24 @@ $inventories = $request -> inventories;
         ->where('process', $inventory['process_id'])
         ->update([
             'voucher_no' => $Voucher,
+            'received_from' => $inventory['pickup_location_id'],
             'process_date' => Date::now(),
         ]);
 
         $inserTempInventory = DB::table('temp_inventory_tbl')->insert([
             'batch_no' => $inventory['batch_no'],
             'voucher_no' => $Voucher,
-            'plates' => $inventory['plates_qty'],
+            
             'qty' => $inventory['print_order'],
             'rate' => $inventory['product_rate'],
             'amount' => $inventory['product_amount'],
             'process' => $inventory['process_id'],
-            'godown' => $inventory['godown_id'],
+            'pickup_location' => $inventory['pickup_location_id'],
+            'lamination_type' => $inventory['lamination_type_id'],
             
         ]);
 
-        $insertPaperInventory = DB::table('inventory_tbl')->insert([
-            'batch_no' => $inventory['batch_no'],
-            'process' => $inventory['process_id'],
-            'voucher_no' => $Voucher,
-            'description' => $inventory['paper_product_id'],
-            'qtyin' => 0,
-            'qtyout' => $inventory['paper_qty'],
-            'godown' => $inventory['godown_id'],
-            'rate' => $inventory['product_rate'],
-            'amount' => $inventory['product_amount'],
-
-        ]);
+       
 
        }
 
