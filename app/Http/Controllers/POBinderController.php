@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Date;
+use Exception;
 
 class POBinderController extends Controller{
 
@@ -81,7 +82,7 @@ $inventories = $request -> inventories;
 
        ]);
        
-    }
+   }
     catch(Exception $e){
         DB::rollback();
         throw $e;

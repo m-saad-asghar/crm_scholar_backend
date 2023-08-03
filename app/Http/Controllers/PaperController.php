@@ -32,8 +32,8 @@ class PaperController extends Controller{
         if ($result == 1 || $result == 0){
             $papers = DB::table("product_tbl")
             ->join('product_child_type_tbl', 'product_tbl.child_type', '=', 'product_child_type_tbl.id')
-            ->select('product_tbl.id', 'product_tbl.product_name', 'product_tbl.length', 'product_tbl.width', 'product_tbl.weight', 'product_child_type_tbl.child_type')
-            ->where('product_tbl.product_type', '=', 2)    
+            ->select('product_tbl.id', 'product_tbl.product_name as paper', 'product_tbl.length', 'product_tbl.width', 'product_tbl.weight', 'product_child_type_tbl.child_type as ptype', 'product_tbl.active')
+            ->where('product_tbl.product_type', '=', 2)     
             ->orderBy("id", "DESC")
                 ->get();
             return response()->json([
@@ -50,7 +50,8 @@ class PaperController extends Controller{
     public function get_papers(Request $request){
         $papers = DB::table("product_tbl")
             ->join('product_child_type_tbl', 'product_tbl.child_type', '=', 'product_child_type_tbl.id')
-            ->select('product_tbl.id', 'product_tbl.product_name', 'product_tbl.length', 'product_tbl.width', 'product_tbl.weight', 'product_child_type_tbl.child_type')
+            ->select('product_tbl.id', 'product_tbl.product_name as paper', 'product_tbl.length', 'product_tbl.width', 'product_tbl.weight', 
+            'product_child_type_tbl.child_type as ptype', 'product_tbl.active', 'product_tbl.child_type as ptype_id')
             ->where('product_tbl.product_type', '=', 2)     
             ->orderBy("id", "DESC")
                 ->get();
@@ -85,6 +86,57 @@ class PaperController extends Controller{
             "success" => true,
             "papers" => $papers
         ]);
+    }
+    public function update_paper(Request $request, $id){
+        $update = DB::table(('product_tbl'))
+        ->where('id', '=', $id)
+        ->update([
+            "product_code" => $request-> paper,
+            "product_sname" => $request-> paper,
+            "product_name" => $request-> paper,
+            
+            "weight" => $request->weight,
+            "length" => $request -> length,
+            "width" => $request -> width,
+            "child_type" => $request -> paper_type,
+        ]);
+
+        if($update === 1){
+            $papers = DB::table("product_tbl")
+            ->join('product_child_type_tbl', 'product_tbl.child_type', '=', 'product_child_type_tbl.id')
+            ->select('product_tbl.id', 'product_tbl.product_name as paper', 'product_tbl.length', 'product_tbl.width', 'product_tbl.weight', 
+            'product_child_type_tbl.child_type as ptype', 'product_tbl.active', 'product_tbl.child_type as ptype_id')
+            ->where('product_tbl.product_type', '=', 2)     
+            ->orderBy("id", "DESC")
+                ->get();
+    
+            return response()->json([
+                "success" => 1,
+                "papers" => $papers
+            ]);
+        }
+        else{
+            return response()->json([
+                "success" => 0,
+                
+            ]);
+        }
+        
+        
+    }
+    public function change_status_paper(Request $request, $id){
+        $result = DB::table("product_tbl")->where("id", $id)->update([
+            "active" => ($request->status == true) ? 1 : 0,
+        ]);
+        if ($result == 1){
+            return response()->json([
+                "success" => 1
+            ]);
+        }else{
+            return response()->json([
+                "success" => 0
+            ]);
+        }
     }
 }
 
