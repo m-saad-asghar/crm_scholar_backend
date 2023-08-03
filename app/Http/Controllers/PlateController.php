@@ -16,7 +16,7 @@ class PlateController extends Controller{
             "pages" => 0,
             "inner_pages" => 0,
             "rule_pages" => 0,
-            "amount_of_farmay" => 0,
+            "farmay" => 0,
             "weight" => 0,
             "subject" => 0,
             "book_for" => 0,
@@ -32,7 +32,7 @@ class PlateController extends Controller{
         if ($result == 1 || $result == 0){
             $plates = DB::table("product_tbl")
             
-            ->select('id', 'product_name')
+            ->select('id', 'product_name as plate', 'active')
             ->where('product_type', '=', 3)    
             ->orderBy("id", "DESC")
                 ->get();
@@ -49,7 +49,7 @@ class PlateController extends Controller{
 
     public function get_plates(Request $request){
         $plates = DB::table("product_tbl")
-            ->select('id', 'product_name')
+            ->select('id', 'product_name as plate', 'active')
             ->where('product_tbl.product_type', '=', 3)    
             ->orderBy("id", "DESC")
                 ->get();
@@ -70,6 +70,50 @@ class PlateController extends Controller{
             "success" => true,
             "plates" => $plates
         ]);
+    }
+    public function update_plate(Request $request, $id){
+        $update = DB::table(('product_tbl'))
+        ->where('id', '=', $id)
+        ->update([
+            "product_code" => $request-> plate,
+            "product_sname" => $request-> plate,
+            "product_name" => $request-> plate,
+        ]);
+
+        if($update === 1){
+            $plates = DB::table("product_tbl")
+            ->select('id', 'product_name as plate', 'active')
+            ->where('product_tbl.product_type', '=', 3)    
+            ->orderBy("id", "DESC")
+                ->get();
+    
+            return response()->json([
+                "success" => 1,
+                "plates" => $plates
+            ]);
+        }
+        else{
+            return response()->json([
+                "success" => 0,
+                
+            ]);
+        }
+        
+        
+    }
+    public function change_status_plate(Request $request, $id){
+        $result = DB::table("product_tbl")->where("id", $id)->update([
+            "active" => ($request->status == true) ? 1 : 0,
+        ]);
+        if ($result == 1){
+            return response()->json([
+                "success" => 1
+            ]);
+        }else{
+            return response()->json([
+                "success" => 0
+            ]);
+        }
     }
 }
 

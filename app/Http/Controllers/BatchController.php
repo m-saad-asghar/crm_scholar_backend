@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Date;
+use Exception;
 
 class BatchController extends Controller{
 
@@ -17,6 +18,8 @@ class BatchController extends Controller{
             'processes' => $result
         ]);
     }
+//-------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------
     public function add_new_batch(Request $request){
         $BatchNo = $this -> generateBatchNo();
 
@@ -122,7 +125,9 @@ catch(Exception $e){
 }
         
     }
-   
+
+//-------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------
     public function generateBatchNo(){
         $currentDate = Date::now();
         $currentYear = $currentDate->format('Y');
@@ -137,14 +142,16 @@ $count = $count + 1;
 $batchNo = "SP-" . $currentYear . '-' . str_pad($currentMonth, 2, '0', STR_PAD_LEFT) . '-' . str_pad($count, 4, '0', STR_PAD_LEFT);
 return $batchNo;
     }
-
+//-------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------
     public function get_batches_against_processes(Request $request, $id){
         
 $result = DB::table("batch_tbl")
 ->join("batch_history_tbl as bht", function($join){
 	$join->on("batch_tbl.batch_no", "=", "bht.batch_no");
 })
-->select("batch_tbl.batch_no")
+->leftJoin('product_tbl as pt', 'batch_tbl.for_product', '=', 'pt.id')
+->select('batch_tbl.batch_no', DB::raw('concat(batch_tbl.batch_no, " (", pt.product_sname, ")") as batch_pro'))
 ->where("batch_tbl.status", "=", 'open')
 ->where("bht.process", "=", $id)
 ->whereNull("bht.voucher_no")
@@ -156,30 +163,24 @@ $result = DB::table("batch_tbl")
             
         ]);
     }
+//-------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------
     public function get_batches_for_product_received(Request $request, $vid){
   
-        /*
-$result = DB::table("batch_tbl")
-->join("batch_history_tbl as bht", function($join){
-	$join->on("batch_tbl.batch_no", "=", "bht.batch_no");
-})
-->select("batch_tbl.batch_no")
-->where("batch_tbl.status", "=", 'open')
-->where("bht.process", "=", 7)
-->where("bht.voucher_no", "!=", NULL)
-->get();
-*/
+        
 
 $result = DB::table("batch_tbl")
 ->join("batch_history_tbl as bht", function($join){
 	$join->on("batch_tbl.batch_no", "=", "bht.batch_no");
 })
 ->join('voucher_tbl', 'bht.voucher_no', '=', 'voucher_tbl.voucher_no')
-->select("batch_tbl.batch_no")
+->leftJoin('product_tbl as pt', 'batch_tbl.for_product', '=', 'pt.id')
+->select('batch_tbl.batch_no', DB::raw('concat(batch_tbl.batch_no, " (", pt.product_sname, ")") as batch_pro'))
 ->where("batch_tbl.status", "=", 'open')
 ->where("bht.process", "=", 7)
 ->where("bht.voucher_no", "!=", NULL)
 ->where("voucher_tbl.account_code", '=', $vid)
+->where("bht.isbilled", "=", 0)
 ->get();
 
         return response()->json([
@@ -188,7 +189,8 @@ $result = DB::table("batch_tbl")
             
         ]);
     }
-
+//-------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------
     public function get_batch_data_for_press(Request $request, $batch, $process){
         $result = DB::table('batch_tbl as bt')
     ->join('product_tbl as pt', 'bt.for_product', '=', 'pt.id')
@@ -220,7 +222,8 @@ else{
         
 
     }
-
+//-------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------
     public function get_batch_data_for_lamination(Request $request, $batch, $process, $recfrom){
        
 $result = DB::select("
@@ -259,7 +262,8 @@ else{
         
 
     }
-
+//-------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------
     public function get_batch_data_for_binding(Request $request, $batch, $process){
        
         $result = DB::select("
@@ -299,7 +303,8 @@ else{
                 
         
             }
-    
+//-------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------    
             public function get_batch_data_for_book_received(Request $request, $batch){
        
                 $result = DB::select("
@@ -335,7 +340,8 @@ else{
                         
                 
                     }
-
+//-------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------
                     public function get_batches_for_pv_against_vendor(Request $request, $process, $vid){
 /*
                         select bht.batch_no from batch_history_tbl bht
@@ -364,6 +370,8 @@ where bht.process = 1 and bht.isbilled = 0 and vt.account_code = '02-01-001'
                     }
 
                     }
+//-------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------
                     public function get_batch_data_for_press_pv(Request $request, $batch, $process){
                         $result = DB::table('temp_inventory_tbl as tit')
                         ->leftjoin('batch_tbl as bt', 'tit.batch_no', '=', 'bt.batch_no')
@@ -386,6 +394,8 @@ where bht.process = 1 and bht.isbilled = 0 and vt.account_code = '02-01-001'
                             ]);
                         }
                     }
+//-------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------
                     public function get_batch_data_for_binder_pv(Request $request, $batch, $process){
                         $result = DB::table('temp_inventory_tbl AS tit')
                         ->select(

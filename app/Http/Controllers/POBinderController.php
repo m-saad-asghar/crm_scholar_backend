@@ -81,7 +81,7 @@ $inventories = $request -> inventories;
 
        ]);
        
-    }
+   }
     catch(Exception $e){
         DB::rollback();
         throw $e;

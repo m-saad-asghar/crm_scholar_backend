@@ -17,6 +17,7 @@ use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\BatchController;
 use App\Http\Controllers\POPressController;
 use App\Http\Controllers\POLaminationController;
+use App\Http\Controllers\AccountVoucherController;
 use App\Http\Controllers\POBinderController;
 use App\Http\Controllers\BookReceiptController;
 
@@ -57,28 +58,41 @@ Route::post('/add_new_book_for_board', [ForBoardController::class, 'add_new_book
 // Routes for Category Form
 Route::post('/add_new_category', [CategoryController::class, 'add_new_category']);
 Route::post('/get_category', [CategoryController::class, 'get_category']);
-
+Route::put('/update_category/{id}', [CategoryController::class, 'update_category']);
+Route::put('/change_status_category/{id}', [CategoryController::class, 'change_status_category']);
 
 
 // Routes for Subject Form
 Route::post('/add_new_subject', [SubjectController::class, 'add_new_subject']);
 Route::post('/get_subjects', [SubjectController::class, 'get_subjects']);
+Route::put('/update_subject/{id}', [SubjectController::class, 'update_subject']);
+Route::put('/change_status_subject/{id}', [SubjectController::class, 'change_status_subject']);
+
 
 // Routes for Paper
 Route::post('/add_new_paper', [PaperController::class, 'add_new_paper']);
 Route::post('/get_papers', [PaperController::class, 'get_papers']);
 Route::post('/get_paper_with_id/{id}', [PaperController::class, 'get_paper_with_id']);
 Route::post('/get_paper_with_type', [PaperController::class, 'get_paper_with_type']);
+Route::put('/update_paper/{id}', [PaperController::class, 'update_paper']);
+Route::put('/change_status_paper/{id}', [PaperController::class, 'change_status_paper']);
+
 
 // Routes for Paper Type
 Route::post('/add_new_paper_type', [PaperTypeController::class, 'add_new_paper_type']);
 Route::post('/get_paper_types', [PaperTypeController::class, 'get_paper_types']);
+Route::put('/update_paper_type/{id}', [PaperTypeController::class, 'update_paper_type']);
+Route::put('/change_status_paper_type/{id}', [PaperTypeController::class, 'change_status_paper_type']);
+
 
 
 // Routes for Plates
 Route::post('/add_new_plate', [PlateController::class, 'add_new_plate']);
 Route::post('/get_plates', [PlateController::class, 'get_plates']);
 Route::post('/get_plate_with_id', [PlateController::class, 'get_plate_with_id']);
+Route::put('/update_plate/{id}', [PlateController::class, 'update_plate']);
+Route::put('/change_status_plate/{id}', [PlateController::class, 'change_status_plate']);
+
 
 // Routes for Godown
 Route::post('/add_new_godown', [GodownController::class, 'add_new_godown']);
@@ -124,6 +138,12 @@ Route::post('/add_new_po_binding', [POBinderController::class, 'add_new_po_bindi
 
 // Routes Book Receipt
 Route::post('/add_new_book_received', [BookReceiptController::class, 'add_new_book_received']);
+
+
+// Routes Account Voucher
+Route::post('/get_accounts_by_type/{atype}', [AccountVoucherController::class, 'get_accounts_by_type']);
+Route::post('/add_new_account_voucher', [AccountVoucherController::class, 'add_new_account_voucher']);
+
 Route::group(['prefix' => 'auth'], function($router){
     Route::post('/register', [AuthController::class, 'register']);
     Route::any('/login', [AuthController::class, 'login'])->name("login");
@@ -134,3 +154,4 @@ Route::group(['middleware' => 'auth:api'], function($router){
     Route::get('/auth/logout', [AuthController::class, 'logout']);
 
 });
+

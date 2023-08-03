@@ -16,7 +16,7 @@ class CategoryController extends Controller{
                 ->get();
             return response()->json([
                 "success" => 1,
-                "categories" => $categories
+                "category" => $categories
             ]);
         }else{
             return response()->json([
@@ -35,6 +35,47 @@ class CategoryController extends Controller{
             "category" => $category
         ]);
     }
+    public function update_category(Request $request, $id){
+        $update = DB::table(('category_tbl'))
+        ->where('id', '=', $id)
+        ->update([
+            "category" => $request -> category, 
+        ]);
+
+        if($update === 1){
+            $category = DB::table("category_tbl")
+            ->orderBy("id", "DESC")
+            ->get();
+    
+            return response()->json([
+                "success" => 1,
+                "category" => $category
+            ]);
+        }
+        else{
+            return response()->json([
+                "success" => 0,
+                
+            ]);
+        }
+        
+        
+    }
+    public function change_status_category(Request $request, $id){
+        $result = DB::table("category_tbl")->where("id", $id)->update([
+            "active" => ($request->status == true) ? 1 : 0,
+        ]);
+        if ($result == 1){
+            return response()->json([
+                "success" => 1
+            ]);
+        }else{
+            return response()->json([
+                "success" => 0
+            ]);
+        }
+    }
+
 }
 
 
