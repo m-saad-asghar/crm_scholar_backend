@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
@@ -138,6 +139,19 @@ Route::post('/add_new_po_binding', [POBinderController::class, 'add_new_po_bindi
 // Routes Book Receipt
 Route::post('/add_new_book_received', [BookReceiptController::class, 'add_new_book_received']);
 
+
 // Routes Account Voucher
 Route::post('/get_accounts_by_type/{atype}', [AccountVoucherController::class, 'get_accounts_by_type']);
 Route::post('/add_new_account_voucher', [AccountVoucherController::class, 'add_new_account_voucher']);
+
+Route::group(['prefix' => 'auth'], function($router){
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::any('/login', [AuthController::class, 'login'])->name("login");
+});
+//Route::group(['middleware' => ['auth:api', 'jwt.refresh']], function () {
+
+Route::group(['middleware' => 'auth:api'], function($router){
+    Route::get('/auth/logout', [AuthController::class, 'logout']);
+
+});
+
