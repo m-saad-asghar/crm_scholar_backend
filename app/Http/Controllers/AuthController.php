@@ -78,7 +78,6 @@ use Illuminate\Support\Facades\Auth;
     }
 
     public function logout(Request $request){
-        return "debug";
         auth()->logout();
 
             return response()->json([
