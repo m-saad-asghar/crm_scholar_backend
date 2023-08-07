@@ -2,9 +2,13 @@
 namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-    use Tymon\JWTAuth\Facades\JWTAuth;
-    use Illuminate\Support\Facades\Validator;
-    use Illuminate\Http\Request;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\PasswordResetMail;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
     class AuthController extends Controller
     {
@@ -65,6 +69,52 @@ use Illuminate\Support\Facades\Auth;
             "success" => 1,
             "jwt_token" => $this->createAuthToken($token)
         ]);
+
+    }
+
+    public function reset_password(Request $request){
+        $user = User::where("email", $request->email)->first();
+        if(!$user){
+            return response()->json([
+                "success" => 'unauthorize'
+            ]);
+        }else{
+            $user = User::where("email", $request->email)->first();
+            $token = Str::random(32);
+            DB::table("password_reset_tokens")->where("email", $request->email)->delete();
+            DB::table("password_reset_tokens")->insert(['email' => $request->email, 'token' => $token]);
+            $reset_link = env('FRONT_END_BASE_URL').'change_password/'.$token;
+            $email = env('RESET_PASSWORD_SENDER_EMAIL');
+             $data = 
+             [
+                'user_name' => $user->name,
+                'user_id' => $user->id,
+                'reset_password_link' => $reset_link
+            ];
+
+        Mail::to($email)->send(new PasswordResetMail($data));
+            return response()->json([
+                "success" => 1
+            ]);
+        }
+
+    }
+
+    public function change_password(Request $request){
+        if($request->password === $request->repeat_password){
+            $record = DB::table("password_reset_tokens")->where("token", $request->token)->first();
+            $password_encrypted = bcrypt($request->password);
+            User::where("email", $record->email)->update([
+                "password" => $password_encrypted
+            ]);
+            return response()->json([
+                "success" => 1
+            ]);
+        }else{
+            return response()->json([
+                "success" => 'mismatch'
+            ]);
+        }
 
     }
 
