@@ -84,7 +84,7 @@ use Illuminate\Support\Facades\DB;
             DB::table("password_reset_tokens")->where("email", $request->email)->delete();
             DB::table("password_reset_tokens")->insert(['email' => $request->email, 'token' => $token]);
             $reset_link = env('FRONT_END_BASE_URL').'change_password/'.$token;
-            $email = env('RESET_PASSWORD_SENDER_EMAIL');
+            $email = $request->email;
              $data = 
              [
                 'user_name' => $user->name,
@@ -107,6 +107,9 @@ use Illuminate\Support\Facades\DB;
             User::where("email", $record->email)->update([
                 "password" => $password_encrypted
             ]);
+
+            DB::table("password_reset_tokens")->where("token", $request->token)->delete();
+
             return response()->json([
                 "success" => 1
             ]);
