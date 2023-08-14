@@ -147,6 +147,8 @@ Route::post('/add_new_account_voucher', [AccountVoucherController::class, 'add_n
 Route::group(['prefix' => 'auth'], function($router){
     Route::post('/register', [AuthController::class, 'register']);
     Route::any('/login', [AuthController::class, 'login'])->name("login");
+    Route::any('/reset_password', [AuthController::class, 'reset_password']);
+    Route::any('/change_password', [AuthController::class, 'change_password']);
 });
 //Route::group(['middleware' => ['auth:api', 'jwt.refresh']], function () {
 
