@@ -39,7 +39,17 @@ Route::get('/test', function () {
     return "This is Test API for Scholar CRM";
 });
 
-// Routes for Product Form
+
+Route::group(['prefix' => 'auth'], function($router){
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::any('/login', [AuthController::class, 'login'])->name("login");
+});
+//Route::group(['middleware' => ['auth:api', 'jwt.refresh']], function () {
+
+Route::group(['middleware' => 'auth:api'], function($router){
+    Route::get('/auth/logout', [AuthController::class, 'logout']);
+
+    // Routes for Product Form
 Route::post('/add_new_product', [ProductController::class, 'add_new_product']);
 Route::post('/get_products', [ProductController::class, 'get_products']);
 Route::post('/get_p_f_plates', [ProductController::class, 'get_p_f_plates']);
@@ -50,10 +60,16 @@ Route::post('/get_products_for_batch', [ProductController::class, 'get_products_
 // Routes for Sheet Size
 Route::post('/add_new_sheet_size', [SheetSizeController::class, 'add_new_sheet_size']);
 Route::post('/get_sheet_sizes', [SheetSizeController::class, 'get_sheet_sizes']);
+Route::put('/update_sheet_size/{id}', [SheetSizeController::class, 'update_sheet_size']);
+Route::put('/change_status_sheet_size/{id}', [SheetSizeController::class, 'change_status_sheet_size']);
+
 
 // Routes for Book For Board
 Route::post('/get_book_for_board', [ForBoardController::class, 'get_book_for_board']);
 Route::post('/add_new_book_for_board', [ForBoardController::class, 'add_new_book_for_board']);
+Route::put('/update_book_for_board/{id}', [ForBoardController::class, 'update_book_for_board']);
+Route::put('/change_status_book_for_board/{id}', [ForBoardController::class, 'change_status_book_for_board']);
+
 
 // Routes for Category Form
 Route::post('/add_new_category', [CategoryController::class, 'add_new_category']);
@@ -108,10 +124,13 @@ Route::post('/get_lamination_vendors', [VendorController::class, 'get_lamination
 Route::post('/get_binder_vendors', [VendorController::class, 'get_binder_vendors']);
 
 // Routes for Voucher
-Route::post('/add_new_voucher', [VoucherController::class, 'add_new_voucher']);
+Route::post('/add_new_voucher/{vtype}', [VoucherController::class, 'add_new_voucher']);
 Route::post('/get_processes_of_vendor_for_pv/{vid}', [VoucherController::class, 'get_processes_of_vendor_for_pv']);
 Route::post('/add_new_voucher_press', [VoucherController::class, 'add_new_voucher_press']);
 Route::post('/add_new_voucher_lamination', [VoucherController::class, 'add_new_voucher_lamination']);
+Route::post('/get_purchase_vouchers/{vtype}', [VoucherController::class, 'get_purchase_vouchers']);
+Route::post('/get_pv_voucher_data/{VoucherNo}', [VoucherController::class, 'get_pv_voucher_data']);
+Route::put('/update_purchase_voucher', [VoucherController::class, 'update_purchase_voucher']);
 
 // Route for Batch
 Route::post('/get_processes', [BatchController::class, 'get_processes']);
@@ -144,14 +163,6 @@ Route::post('/add_new_book_received', [BookReceiptController::class, 'add_new_bo
 Route::post('/get_accounts_by_type/{atype}', [AccountVoucherController::class, 'get_accounts_by_type']);
 Route::post('/add_new_account_voucher', [AccountVoucherController::class, 'add_new_account_voucher']);
 
-Route::group(['prefix' => 'auth'], function($router){
-    Route::post('/register', [AuthController::class, 'register']);
-    Route::any('/login', [AuthController::class, 'login'])->name("login");
-});
-//Route::group(['middleware' => ['auth:api', 'jwt.refresh']], function () {
-
-Route::group(['middleware' => 'auth:api'], function($router){
-    Route::get('/auth/logout', [AuthController::class, 'logout']);
 
 });
 

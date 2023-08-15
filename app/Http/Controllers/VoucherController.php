@@ -26,7 +26,7 @@ return $voucher;
     }
 
 
-    public function add_new_voucher(Request $request){
+    public function add_new_voucher(Request $request, $vtype){
 
         $currentDate = Date::now();
        
@@ -46,7 +46,7 @@ try{
         "ref_no" => '',
         "created_date" => $currentDate,
         "created_by" => 1,
-        "voucher_type" => 'Purchase Voucher',
+        "voucher_type" => $vtype,
         
     ]);
     
@@ -80,6 +80,7 @@ try{
                "godown" => $inventory['godown_id'],
                "batch_no" => '',
                "rate" => $inventory['product_rate'],
+               "amount" => $inventory['product_amount'],
                "product_for" => $inventory['product_for'],
 
             ]);
@@ -88,9 +89,15 @@ try{
 
     DB::commit();
 
+    $vouchers = DB::table('voucher_tbl as vt')
+        ->leftJoin('chart_of_account_tbl as coa', 'vt.account_code', '=', 'coa.code')
+        ->select('vt.id', 'vt.voucher_no', 'coa.account_name', 'vt.gross_amount', 'vt.discount', 'vt.net_amount', 'vt.created_date')
+        ->where('vt.voucher_type', '=', $vtype)
+        ->get();
+
     return response()->json([
         "success" => 1,
-        "voucher" => $voucher,
+        "vouchers" => $vouchers,
         
     ]);
 }
@@ -99,7 +106,7 @@ DB::rollback();
 
 return response()->json([
     "success" => 0,
-    "voucher" => $voucher,
+    
     
 ]);
 } 
@@ -312,7 +319,135 @@ return response()->json([
 
     }
 
+    public function get_purchase_vouchers(Request $request, $vtype){
+        $vouchers = DB::table('voucher_tbl as vt')
+        ->leftJoin('chart_of_account_tbl as coa', 'vt.account_code', '=', 'coa.code')
+        ->select('vt.id', 'vt.voucher_no', 'coa.account_name', 'vt.gross_amount', 'vt.discount', 'vt.net_amount', 'vt.created_date')
+        ->where('vt.voucher_type', '=', $vtype)
+        ->get();
+
+        
+            return response()->json([
+                "success" => 1,
+                "vouchers" => $vouchers,
+                
+            ]);
+        
+        
+    }
+    public function update_purchase_voucher(Request $request){
+
+        $updateVoucher = DB::table('voucher_tbl')
+        ->where('voucher_no', '=', $request -> Voucher['voucher_no'])
+        ->update([
+        
+        "gross_amount" => $request -> Voucher['total_amount'],
+        "discount" => 0,
+        "net_amount" => $request -> Voucher['total_amount'],
+        
+        ]);
+
+        $register = DB::table('account_register_tbl')
+        ->where("account_code" ,'=', $request -> Voucher['vendor_code'])
+        ->where("voucher_no" ,'=', $request -> Voucher['voucher_no'])
+        ->update([
+            
+            "cr" => $request -> Voucher['total_amount'],
+            
     
+        ]);
+    
+        $register1 = DB::table('account_register_tbl')
+        ->where("account_code" ,'=', '05-01-001')
+        ->where("voucher_no" ,'=', $request -> Voucher['voucher_no'])
+        ->update([
+            
+            "dr" => $request -> Voucher['total_amount'],
+           
+    
+        ]);
+
+        // Delete Inventories
+        $inventories = $request -> inventories;
+        foreach($inventories['deletedEntries'] as $inventory){
+            $deleteInventories = DB::table(('inventory_tbl'))
+        ->where('id', '=', $inventory['inventory_id'])
+        ->update([
+            'active' => 0
+        ]);
+    }
+        // Update Inventories
+        foreach($inventories['updatedEntries'] as $inventory){
+            $deleteInventories = DB::table(('inventory_tbl'))
+        ->where('id', '=', $inventory['inventory_id'])
+        ->update([
+            'qtyin' => $inventory['product_qty'],
+            'rate' => $inventory['product_rate'],
+            'amount' => $inventory['product_amount'],
+            "product_for" => $inventory['product_for'],
+        ]);
+    }
+
+        // Inserted Inventories
+        foreach($inventories['insertedEntries'] as $inventory){
+            DB::table('inventory_tbl')->insert([
+                "voucher_no" => $request -> Voucher['voucher_no'],
+               "description" => $inventory['product_id'],
+               "qtyin" => $inventory['product_qty'],
+               "qtyout" => 0,
+               "godown" => $inventory['godown_id'],
+               "batch_no" => '',
+               "rate" => $inventory['product_rate'],
+               "amount" => $inventory['product_amount'],
+               "product_for" => $inventory['product_for'],
+
+            ]);
+
+    }
+
+    $vouchers = DB::table('voucher_tbl as vt')
+    ->leftJoin('chart_of_account_tbl as coa', 'vt.account_code', '=', 'coa.code')
+    ->select('vt.id', 'vt.voucher_no', 'coa.account_name', 'vt.gross_amount', 'vt.discount', 'vt.net_amount', 'vt.created_date')
+    ->where('vt.voucher_type', '=', 'Purchase Voucher PP')
+    ->get();
+
+    
+        return response()->json([
+            "success" => 1,
+            "vouchers" => $vouchers,
+            
+        ]);
+    
+        
+    }
+
+    public function get_pv_voucher_data(Request $request, $VoucherNo){
+       
+
+        $inventories = DB::table('inventory_tbl as it')
+        ->leftJoin('product_tbl as pt', 'it.description', '=', 'pt.id')
+        ->leftJoin('godown_tbl as gt', 'it.godown', '=', 'gt.id')
+        ->leftJoin('product_tbl as pt1', 'it.product_for', '=', 'pt1.id')
+        ->where('voucher_no', '=', $VoucherNo)
+        ->select('it.*', 'pt.product_name', 'gt.name as godownName', 'pt1.product_name as productFor')
+        ->get();
+
+        
+        if($inventories -> count() > 0){
+            return response()->json([
+                "success" => 1,
+                "inventories" => $inventories,
+                
+            ]);
+        }
+        else{
+            return response()->json([
+                "success" => 0,
+                
+                
+            ]);
+        }
+    }
 
     }
 

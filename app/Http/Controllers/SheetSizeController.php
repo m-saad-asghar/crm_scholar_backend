@@ -39,6 +39,49 @@ class SheetSizeController extends Controller{
             "sheets" => $sheets
         ]);
     }
+    public function update_sheet_size(Request $request, $id){
+        $update = DB::table(('sheet_size_tbl'))
+        ->where('id', '=', $id)
+        ->update([
+            "sheet" => $request -> sheet,
+            "length" => $request -> length,
+            "width" => $request -> width,
+            "portion" => $request -> portion,
+        ]);
+
+        if($update === 1){
+            $sheets = DB::table("sheet_size_tbl")
+            ->orderBy("id", "DESC")
+            ->get();
+    
+            return response()->json([
+                "success" => 1,
+                "sheets" => $sheets
+            ]);
+        }
+        else{
+            return response()->json([
+                "success" => 0,
+                
+            ]);
+        }
+        
+        
+    }
+    public function change_status_sheet_size(Request $request, $id){
+        $result = DB::table("sheet_size_tbl")->where("id", $id)->update([
+            "active" => ($request->status == true) ? 1 : 0,
+        ]);
+        if ($result == 1){
+            return response()->json([
+                "success" => 1
+            ]);
+        }else{
+            return response()->json([
+                "success" => 0
+            ]);
+        }
+    }
 }
 
 

@@ -41,6 +41,7 @@ class ProductController extends Controller
                     "book_sheet.sheet as book_sheet_size_label",
                     "title_sheet.sheet as title_sheet_size_label"
                 )
+                ->where('product_tbl.product_type', '=', 1)
                 ->get();
             return response()->json([
                 "success" => 1,
@@ -63,6 +64,7 @@ class ProductController extends Controller
             ->leftJoin("sheet_size_tbl as book_sheet", "book_sheet.id", "product_tbl.book_sheet_size")
             ->leftJoin("sheet_size_tbl as title_sheet", "title_sheet.id", "product_tbl.title_sheet_size")
             ->orderBy("id", "DESC")
+            ->where('product_tbl.product_type', '=', 1)
             ->where(function ($query) use ($request) {
                 if($request->search_term !== ""){
                     $query->where('product_tbl.product_code', 'LIKE', '%' . $request->search_term . '%')
@@ -143,6 +145,7 @@ class ProductController extends Controller
                     "book_sheet.sheet as book_sheet_size_label",
                     "title_sheet.sheet as title_sheet_size_label"
                 )
+                ->where('product_type', '=', 1)
                 ->get();
             return response()->json([
                 "success" => 1,
