@@ -20,6 +20,7 @@ use App\Http\Controllers\POLaminationController;
 use App\Http\Controllers\AccountVoucherController;
 use App\Http\Controllers\POBinderController;
 use App\Http\Controllers\BookReceiptController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,7 +42,7 @@ Route::get('/test', function () {
 
 // Routes for Product Form
 Route::post('/add_new_product', [ProductController::class, 'add_new_product']);
-Route::post('/get_products', [ProductController::class, 'get_products']);
+// Route::post('/get_products', [ProductController::class, 'get_products']);
 Route::post('/get_p_f_plates', [ProductController::class, 'get_p_f_plates']);
 Route::put('/update_product/{id}', [ProductController::class, 'update_product']);
 Route::put('/change_status_product/{id}', [ProductController::class, 'change_status_product']);
@@ -154,6 +155,7 @@ Route::group(['prefix' => 'auth'], function($router){
 
 Route::group(['middleware' => 'auth:api'], function($router){
     Route::get('/auth/logout', [AuthController::class, 'logout']);
-
+    Route::post('/profile_setting', [UserController::class, 'profile_setting']);
+    Route::post('/get_products', [ProductController::class, 'get_products']);
 });
 

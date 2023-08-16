@@ -32,7 +32,7 @@ use Illuminate\Support\Facades\DB;
             $user  = new User();
             $user->name = $request->name;
             $user->email = $request->email;
-            $user->password = $request->password;
+            $user->password = $password_encrypted;
             if($user->save()){
                 return response()->json([
                     "success" => 1,
