@@ -106,11 +106,24 @@ $processes = $request -> batch_processes;
         ]);
        }
 
+       $batches = DB::table('batch_tbl as bt')
+        ->leftjoin('product_tbl as pt1', 'bt.for_product', '=', 'pt1.id')
+        ->leftjoin('product_tbl as pt2', 'bt.paper_for_book', '=', 'pt2.id')
+        ->leftjoin('product_tbl as pt3', 'bt.paper_for_title', '=', 'pt3.id')
+        ->leftjoin('product_tbl as pt4', 'bt.paper_for_inner', '=', 'pt4.id')
+        ->leftjoin('product_tbl as pt5', 'bt.paper_for_rule', '=', 'pt5.id')
+        ->select('bt.*', 'pt1.product_name as Product', 'pt2.product_name as paperForBook', 'pt3.product_name as paperForTitle', 'pt4.product_name as paperForInner', 'pt5.product_name as paperForRule')
+        ->Orderby('bt.status', 'DESC')
+        ->orderby('bt.id', 'DESC')
+        ->get();
+
        DB::commit();
+
+       
 if($result == 1){
     return response()->json([
-        'success' => 1
-        
+        'success' => 1,
+        'batches' => $batches, 
     ]);
 }
 
@@ -124,6 +137,204 @@ catch(Exception $e){
     ]);
 }
         
+    }
+//-------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------
+
+    public function get_batches(Request $request){
+        $batches = DB::table('batch_tbl as bt')
+        ->leftjoin('product_tbl as pt1', 'bt.for_product', '=', 'pt1.id')
+        ->leftjoin('product_tbl as pt2', 'bt.paper_for_book', '=', 'pt2.id')
+        ->leftjoin('product_tbl as pt3', 'bt.paper_for_title', '=', 'pt3.id')
+        ->leftjoin('product_tbl as pt4', 'bt.paper_for_inner', '=', 'pt4.id')
+        ->leftjoin('product_tbl as pt5', 'bt.paper_for_rule', '=', 'pt5.id')
+        ->select('bt.*', 'pt1.product_name as Product', 'pt2.product_name as paperForBook', 'pt3.product_name as paperForTitle', 'pt4.product_name as paperForInner', 'pt5.product_name as paperForRule')
+        ->Orderby('bt.status', 'DESC')
+        ->orderby('bt.id', 'DESC')
+        ->get();
+
+        return response()->json([
+            
+            'batches'=> $batches,
+            
+        ]);
+    }
+//-------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------
+    public function get_processes_of_batch(Request $request, $batchNo){
+        $processes = DB::table('batch_process_tbl as bpt')
+        ->leftjoin('batch_history_tbl as bht', 'bpt.id', '=', 'bht.process')
+        ->select('bht.process as id', 'bpt.process')
+        ->where('bht.batch_no', '=', $batchNo)
+        ->where('bht.active', '=', 1)
+        ->get();
+
+        return response()->json([
+            
+            'processes'=> $processes,
+            
+        ]);
+
+    }
+//-------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------
+    public function check_batch_isupdateable(Request $request, $batchno){
+        $updateable = DB::table('batch_history_tbl as bht')
+        ->leftjoin('voucher_tbl as vt', 'bht.voucher_no', '=', 'vt.voucher_no')
+        ->where('bht.batch_no', '=', $batchno)
+        ->where('vt.active', '=', 1)
+        ->count();
+
+        if($updateable == 0){
+            return response()->json([
+            
+                'isUpdateable'=> 1,
+                
+            ]);
+        }
+        else{
+            return response()->json([
+            
+                'isUpdateable'=> 0,
+                
+            ]);
+        }
+    }
+//-------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------
+
+    public function update_batch(Request $request, $id){
+
+        DB::beginTransaction();
+        try{
+            $updateBatch = DB::table('batch_tbl')
+            ->where('id', '=', $id)
+            ->update([
+                'for_product' => $request -> for_product,
+                'book_print_qty' => $request -> book_print_qty,
+                'book_paper_qty' => $request -> book_paper_qty,
+                'book_paper_wastage' => $request -> wastage,
+                'title_print_qty' => $request -> book_print_qty,
+                'title_paper_qty' => $request -> title_paper_qty,
+                'title_paper_wastage' => $request -> wastage,
+                'inner_paper_qty' => $request -> inner_paper_qty,
+                'inner_print_qty' => $request -> book_print_qty,
+                'inner_paper_wastage' => $request -> wastage,
+                'rule_paper_qty' => $request -> rule_paper_qty,
+                'rule_print_qty' => $request -> book_print_qty,
+                'rule_paper_wastage' => $request -> wastage,
+                'paper_for_book' => $request -> paper_for_book,
+                'paper_for_inner' => $request -> paper_for_inner,
+                'paper_for_rule' => $request -> paper_for_rule,
+                'paper_for_title' => $request -> paper_for_title,
+                'status' => $request -> status,           
+            ]);
+    
+            $inActiveHistory = DB::table('batch_history_tbl')
+            ->where('batch_no', '=', $request -> batch_no)
+            ->update(['active' => 0]);
+    
+            foreach($request -> batch_processes as $process){
+    
+                $product = '';
+                $paperQty = '';
+                if($process['id'] == '1')
+                {
+                    $product = $request -> paper_for_book;
+                    $paperQty = $request -> book_paper_qty;
+                }
+                else  if($process['id'] == '2')
+                {
+                    $product = $request -> paper_for_title;
+                    $paperQty = $request -> title_paper_qty;
+                }
+                else  if($process['id'] == '3')
+                {
+                    $product = $request -> paper_for_inner;
+                    $paperQty = $request -> inner_paper_qty;
+                }
+                else  if($process['id'] == '4')
+                {
+                    $product = $request -> paper_for_rule;
+                    $paperQty = $request -> rule_paper_qty;
+                }
+                else  if($process['id'] == '5')
+                {
+                    $product = 0;
+                    $paperQty = 0;
+                }
+                else  if($process['id'] == '6')
+                {
+                    $product = 0;
+                    $paperQty = 0;
+                }
+                else  if($process['id'] == '7')
+                {
+                    $product = 0;
+                    $paperQty = 0;
+                }
+                else{
+                    $product = 0;
+                    $paperQty = 0;
+                }
+                $upsertData = DB::table('batch_history_tbl')
+                ->upsert([
+                    'batch_no' => $request -> batch_no,
+                    'process' => $process['id'],
+                    'order_qty' => $request -> book_print_qty,
+                    'raw_product' => $product,
+                    'paper_qty' => $paperQty,
+                    'active' => 1,
+                ], ['batch_no', 'process']);
+            }
+            $batches = DB::table('batch_tbl as bt')
+            ->leftjoin('product_tbl as pt1', 'bt.for_product', '=', 'pt1.id')
+            ->leftjoin('product_tbl as pt2', 'bt.paper_for_book', '=', 'pt2.id')
+            ->leftjoin('product_tbl as pt3', 'bt.paper_for_title', '=', 'pt3.id')
+            ->leftjoin('product_tbl as pt4', 'bt.paper_for_inner', '=', 'pt4.id')
+            ->leftjoin('product_tbl as pt5', 'bt.paper_for_rule', '=', 'pt5.id')
+            ->select('bt.*', 'pt1.product_name as Product', 'pt2.product_name as paperForBook', 'pt3.product_name as paperForTitle', 'pt4.product_name as paperForInner', 'pt5.product_name as paperForRule')
+            ->Orderby('bt.status', 'DESC')
+            ->orderby('bt.id', 'DESC')
+            ->get();
+
+            DB::commit();
+    
+            return response()->json([
+                
+                'batches'=> $batches,
+                'success' => 1,
+                
+            ]);
+
+        }
+        catch(Exception $e){
+            DB::rollback();
+            return response()->json([
+                
+                'success' => 0,
+                'exception' => $e,
+                
+            ]);
+        }
+        
+        }
+
+//-------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------
+    public function change_status_batch(Request $request, $id){
+        $result = DB::table("batch_tbl")->where("id", $id)->update([
+            "status" => $request->status,
+        ]);
+        if ($result == 1){
+            return response()->json([
+                "success" => 1
+            ]);
+        }else{
+            return response()->json([
+                "success" => 0
+            ]);
+        }
     }
 
 //-------------------------------------------------------------------------------------------
