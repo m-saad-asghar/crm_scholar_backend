@@ -183,7 +183,7 @@ class ProductController extends Controller
         'title_tbl.length as t_length', 'title_tbl.width as t_width', 'farmay')
         ->leftjoin('sheet_size_tbl as sheet_tbl', 'sheet_tbl.id', '=', 'product_tbl.book_sheet_size')
         ->leftjoin('sheet_size_tbl as title_tbl', 'title_tbl.id', '=', 'product_tbl.title_sheet_size')
-        ->where('active', '=', 1)
+        ->where('product_tbl.active', '=', 1)
         ->where('product_type', '=', 1)
         ->orderBy('id', 'DESC')
         ->get();

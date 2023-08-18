@@ -429,6 +429,7 @@ return response()->json([
         ->leftJoin('godown_tbl as gt', 'it.godown', '=', 'gt.id')
         ->leftJoin('product_tbl as pt1', 'it.product_for', '=', 'pt1.id')
         ->where('voucher_no', '=', $VoucherNo)
+        ->where('it.active', '=', 1)
         ->select('it.*', 'pt.product_name', 'gt.name as godownName', 'pt1.product_name as productFor')
         ->get();
 

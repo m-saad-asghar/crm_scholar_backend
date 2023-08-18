@@ -145,6 +145,11 @@ Route::post('/get_batch_data_for_book_received/{batch}', [BatchController::class
 Route::post('/get_batches_for_pv_against_vendor/{process}/{vid}', [BatchController::class, 'get_batches_for_pv_against_vendor']);
 Route::post('/get_batch_data_for_press_pv/{batch}/{process}', [BatchController::class, 'get_batch_data_for_press_pv']);
 Route::post('/get_batch_data_for_binder_pv/{batch}/{process}', [BatchController::class, 'get_batch_data_for_binder_pv']);
+Route::post('/get_batches', [BatchController::class, 'get_batches']);
+Route::post('/get_processes_of_batch/{batchno}', [BatchController::class, 'get_processes_of_batch']);
+Route::post('/check_batch_isupdateable/{batchno}', [BatchController::class, 'check_batch_isupdateable']);
+Route::put('/update_batch/{id}', [BatchController::class, 'update_batch']);
+Route::put('/change_status_batch/{id}', [BatchController::class, 'change_status_batch']);
 
 
 // Routes for PO Press
@@ -178,3 +183,4 @@ Route::group(['middleware' => 'auth:api'], function($router){
     Route::post('/get_products', [ProductController::class, 'get_products']);
 });
 
+}
