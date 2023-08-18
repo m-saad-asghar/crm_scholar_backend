@@ -178,3 +178,4 @@ Route::group(['middleware' => 'auth:api'], function($router){
     Route::post('/get_products', [ProductController::class, 'get_products']);
 });
 
+}
