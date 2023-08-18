@@ -16,7 +16,7 @@ class ForBoardController extends Controller{
                 ->get();
             return response()->json([
                 "success" => 1,
-                "subjects" => $boards
+                "boards" => $boards
             ]);
         }else{
             return response()->json([
@@ -36,6 +36,47 @@ class ForBoardController extends Controller{
         ]);
 
     }
+    public function update_book_for_board(Request $request, $id){
+        $update = DB::table(('book_for_board_tbl'))
+        ->where('id', '=', $id)
+        ->update([
+            "name" => $request -> board, 
+        ]);
+
+        if($update === 1){
+            $boards = DB::table("book_for_board_tbl")
+            ->orderBy("id", "DESC")
+            ->get();
+    
+            return response()->json([
+                "success" => 1,
+                "boards" => $boards
+            ]);
+        }
+        else{
+            return response()->json([
+                "success" => 0,
+                
+            ]);
+        }
+        
+        
+    }
+    public function change_status_book_for_board(Request $request, $id){
+        $result = DB::table("book_for_board_tbl")->where("id", $id)->update([
+            "active" => ($request->status == true) ? 1 : 0,
+        ]);
+        if ($result == 1){
+            return response()->json([
+                "success" => 1
+            ]);
+        }else{
+            return response()->json([
+                "success" => 0
+            ]);
+        }
+    }
+
 }
 
 
