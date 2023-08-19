@@ -33,26 +33,18 @@ use App\Http\Controllers\UserController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-Route::get('/test', function () {
-    return "This is Test API for Scholar CRM";
-});
-
-
 Route::group(['prefix' => 'auth'], function($router){
     Route::post('/register', [AuthController::class, 'register']);
     Route::any('/login', [AuthController::class, 'login'])->name("login");
 });
-//Route::group(['middleware' => ['auth:api', 'jwt.refresh']], function () {
 
 Route::group(['middleware' => 'auth:api'], function($router){
     Route::get('/auth/logout', [AuthController::class, 'logout']);
 
     // Routes for Product Form
 Route::post('/add_new_product', [ProductController::class, 'add_new_product']);
-// Route::post('/get_products', [ProductController::class, 'get_products']);
+//Route::post('/get_products', [ProductController::class, 'get_products']);
+Route::post('/get_products', [ProductController::class, 'get_products']);
 Route::post('/get_p_f_plates', [ProductController::class, 'get_p_f_plates']);
 Route::put('/update_product/{id}', [ProductController::class, 'update_product']);
 Route::put('/change_status_product/{id}', [ProductController::class, 'change_status_product']);
@@ -110,7 +102,6 @@ Route::post('/get_plate_with_id', [PlateController::class, 'get_plate_with_id'])
 Route::put('/update_plate/{id}', [PlateController::class, 'update_plate']);
 Route::put('/change_status_plate/{id}', [PlateController::class, 'change_status_plate']);
 
-
 // Routes for Godown
 Route::post('/add_new_godown', [GodownController::class, 'add_new_godown']);
 Route::post('/get_godowns', [GodownController::class, 'get_godowns']);
@@ -151,9 +142,9 @@ Route::post('/check_batch_isupdateable/{batchno}', [BatchController::class, 'che
 Route::put('/update_batch/{id}', [BatchController::class, 'update_batch']);
 Route::put('/change_status_batch/{id}', [BatchController::class, 'change_status_batch']);
 
-
 // Routes for PO Press
 Route::post('/add_new_po_press', [POPressController::class, 'add_new_po_press']);
+Route::post('/get_pos/{potype}', [POPressController::class, 'get_pos']);
 
 // Routes for PO Lamination
 Route::post('/add_new_po_lamination', [POLaminationController::class, 'add_new_po_lamination']);
@@ -169,18 +160,14 @@ Route::post('/add_new_book_received', [BookReceiptController::class, 'add_new_bo
 Route::post('/get_accounts_by_type/{atype}', [AccountVoucherController::class, 'get_accounts_by_type']);
 Route::post('/add_new_account_voucher', [AccountVoucherController::class, 'add_new_account_voucher']);
 
-Route::group(['prefix' => 'auth'], function($router){
-    Route::post('/register', [AuthController::class, 'register']);
+
+Route::post('/register', [AuthController::class, 'register']);
     Route::any('/login', [AuthController::class, 'login'])->name("login");
     Route::any('/reset_password', [AuthController::class, 'reset_password']);
     Route::any('/change_password', [AuthController::class, 'change_password']);
-});
-//Route::group(['middleware' => ['auth:api', 'jwt.refresh']], function () {
 
-Route::group(['middleware' => 'auth:api'], function($router){
     Route::get('/auth/logout', [AuthController::class, 'logout']);
     Route::post('/profile_setting', [UserController::class, 'profile_setting']);
     Route::post('/get_products', [ProductController::class, 'get_products']);
-});
 
-}
+});

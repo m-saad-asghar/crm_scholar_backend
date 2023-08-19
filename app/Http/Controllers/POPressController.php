@@ -23,7 +23,8 @@ $voucher = "PO-" . $currentYear . str_pad($currentMonth, 2, '0', STR_PAD_LEFT) .
 
 return $voucher;
     }
-
+//------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------
     public function add_new_po_press(Request $request){
        $Voucher = $this -> generateVoucher();
        DB::beginTransaction();
@@ -102,4 +103,20 @@ $inventories = $request -> inventories;
 
 
     }
+//------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------
+
+public function get_pos(Request $request){
+    $orders = DB::table('voucher_tbl as vt')
+    ->leftjoin('chart_of_account_tbl as coa', 'vt.account_code', '=', 'coa.code')
+    ->select('vt.voucher_no', 'coa.account_name', 'vt.created_date')
+    ->get();
+
+    return response()->json([
+        'success' => 1,
+        'pos' => $orders
+
+       ]);
+
+}
 }
