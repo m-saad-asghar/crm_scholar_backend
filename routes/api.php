@@ -36,14 +36,15 @@ use App\Http\Controllers\UserController;
 Route::group(['prefix' => 'auth'], function($router){
     Route::post('/register', [AuthController::class, 'register']);
     Route::any('/login', [AuthController::class, 'login'])->name("login");
+    Route::any('/reset_password', [AuthController::class, 'reset_password']);
+    Route::any('/change_password', [AuthController::class, 'change_password']);
 });
 
-Route::group(['middleware' => 'auth:api'], function($router){
+// Route::group(['middleware' => 'auth:api'], function($router){
     Route::get('/auth/logout', [AuthController::class, 'logout']);
 
     // Routes for Product Form
 Route::post('/add_new_product', [ProductController::class, 'add_new_product']);
-//Route::post('/get_products', [ProductController::class, 'get_products']);
 Route::post('/get_products', [ProductController::class, 'get_products']);
 Route::post('/get_p_f_plates', [ProductController::class, 'get_p_f_plates']);
 Route::put('/update_product/{id}', [ProductController::class, 'update_product']);
@@ -162,12 +163,10 @@ Route::post('/add_new_account_voucher', [AccountVoucherController::class, 'add_n
 
 
 Route::post('/register', [AuthController::class, 'register']);
-    Route::any('/login', [AuthController::class, 'login'])->name("login");
-    Route::any('/reset_password', [AuthController::class, 'reset_password']);
-    Route::any('/change_password', [AuthController::class, 'change_password']);
-
     Route::get('/auth/logout', [AuthController::class, 'logout']);
     Route::post('/profile_setting', [UserController::class, 'profile_setting']);
-    Route::post('/get_products', [ProductController::class, 'get_products']);
-
-});
+    Route::post('/get_users', [UserController::class, 'get_users']);
+    Route::put('/change_status_user/{id}', [UserController::class, 'change_status_user']);
+    Route::post('/add_new_user', [UserController::class, 'add_new_user']);
+    Route::put('/update_user/{id}', [UserController::class, 'update_user']);
+// });
