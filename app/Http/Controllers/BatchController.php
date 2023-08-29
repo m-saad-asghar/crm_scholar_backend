@@ -366,6 +366,7 @@ $result = DB::table("batch_tbl")
 ->where("batch_tbl.status", "=", 'open')
 ->where("bht.process", "=", $id)
 ->whereNull("bht.voucher_no")
+
 ->get();
 
         return response()->json([

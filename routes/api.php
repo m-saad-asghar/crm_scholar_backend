@@ -145,12 +145,19 @@ Route::put('/change_status_batch/{id}', [BatchController::class, 'change_status_
 // Routes for PO Press
 Route::post('/add_new_po_press', [POPressController::class, 'add_new_po_press']);
 Route::post('/get_pos/{potype}', [POPressController::class, 'get_pos']);
+Route::put('/change_status_po/{id}', [POPressController::class, 'change_status_po']);
+Route::post('/get_po_press_detail/{voucher}', [POPressController::class, 'get_po_press_detail']);
+Route::post('/update_po_press', [POPressController::class, 'update_po_press']);
 
 // Routes for PO Lamination
 Route::post('/add_new_po_lamination', [POLaminationController::class, 'add_new_po_lamination']);
+Route::post('/get_po_lamination_detail/{voucher}', [POLaminationController::class, 'get_po_lamination_detail']);
+Route::post('/update_po_lamination', [POLaminationController::class, 'update_po_lamination']);
 
 // Routes for PO Binding
 Route::post('/add_new_po_binding', [POBinderController::class, 'add_new_po_binding']);
+Route::post('/update_po_binding', [POBinderController::class, 'update_po_binding']);
+Route::post('/get_po_binding_detail/{voucher}', [POBinderController::class, 'get_po_binding_detail']);
 
 // Routes Book Receipt
 Route::post('/add_new_book_received', [BookReceiptController::class, 'add_new_book_received']);

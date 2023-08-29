@@ -41,7 +41,7 @@ try{
         "ref_no" => '',
         "created_date" => Date::now(),
         "created_by" => 1,
-        "voucher_type" => 'Purchase Order',
+        "voucher_type" => 'Purchase Order Press',
        ]);
        
 
@@ -55,6 +55,7 @@ $inventories = $request -> inventories;
         ->update([
             'voucher_no' => $Voucher,
             'process_date' => Date::now(),
+            'active' => 1,
         ]);
 
         $inserTempInventory = DB::table('temp_inventory_tbl')->insert([
@@ -85,9 +86,14 @@ $inventories = $request -> inventories;
        }
 
        DB::commit();
+       $posResponse = $this -> get_pos($request, 'Purchase Order Press');
+       if ($posResponse->getStatusCode() == 200) 
+        $latestData = json_decode($posResponse->getContent(), true);
+        
 
        return response()->json([
         'success' => 1,
+        'pos' => $latestData['pos'],
 
        ]);
        
@@ -106,10 +112,12 @@ $inventories = $request -> inventories;
 //------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------
 
-public function get_pos(Request $request){
+public function get_pos(Request $request, $potype){
     $orders = DB::table('voucher_tbl as vt')
     ->leftjoin('chart_of_account_tbl as coa', 'vt.account_code', '=', 'coa.code')
-    ->select('vt.voucher_no', 'coa.account_name', 'vt.created_date')
+    ->select('vt.id', 'vt.voucher_no', 'coa.account_name', 'vt.created_date', 'vt.active', 'vt.account_code')
+    ->where('vt.voucher_type', '=', $potype)
+    ->orderby('vt.id', 'DESC')
     ->get();
 
     return response()->json([
@@ -118,5 +126,135 @@ public function get_pos(Request $request){
 
        ]);
 
+}
+//------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------
+
+public function change_status_po(Request $request, $id){
+    $result = DB::table('voucher_tbl')
+    ->where('id', '=', $id)
+    ->update(["active" => $request->status,]);
+
+    if ($result == 1){
+        return response()->json([
+            "success" => 1
+        ]);
+    }else{
+        return response()->json([
+            "success" => 0
+        ]);
+    }
+}
+//------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------
+public function get_po_press_detail(Request $request, $voucherno){
+    $result = DB::table('po_press_detail_view')
+    ->where('voucher_no', '=', $voucherno)
+    ->get();
+
+    return response()->json([
+        "data" => $result,
+        "success" => 1,
+    ]);
+
+}
+//------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------
+public function update_po_press(Request $request){
+    DB::beginTransaction();
+    try{
+        $result = DB::table('voucher_tbl')
+        ->where('voucher_no', '=', $request -> Voucher['voucher'])
+        ->update([
+           
+            "gross_amount" => $request -> Voucher['total_amount'],
+           
+            "net_amount" => $request -> Voucher['total_amount'],
+            
+           ]);
+    
+           // Delete Inventories
+           $inventories = $request -> inventories;
+           foreach($inventories['deletedEntries'] as $inventory){
+               $deleteBHT = DB::table(('batch_history_tbl'))
+           ->where('batch_no', '=', $inventory['batch_no'])
+           ->where('process', '=', $inventory['process_id'])
+           ->update([
+               'voucher_no' => null,
+               
+           ]);
+    
+           $deletetempinventories = DB::table('temp_inventory_tbl')
+           ->where('batch_no', '=', $inventory['batch_no'])
+           ->where('process', '=', $inventory['process_id'])
+           ->delete();
+    
+           $deleteinventories = DB::table('inventory_tbl')
+           ->where('batch_no', '=', $inventory['batch_no'])
+           ->where('process', '=', $inventory['process_id'])
+           ->delete();
+    
+    
+       }
+       // Insert Inventories
+       $inventories = $request -> inventories;
+       foreach($inventories['insertedEntries'] as $inventory){
+           $deleteInventories = DB::table(('batch_history_tbl'))
+       ->where('batch_no', '=', $inventory['batch_no'])
+       ->where('process', '=', $inventory['process_id'])
+       ->update([
+        'voucher_no' => $request -> Voucher['voucher'],
+        'process_date' => Date::now(),
+        'active' => 1,
+           
+       ]);
+    
+       $inserTempInventory = DB::table('temp_inventory_tbl')->insert([
+        'batch_no' => $inventory['batch_no'],
+        'voucher_no' => $request -> Voucher['voucher'],
+        'plates' => $inventory['plates_qty'],
+        'qty' => $inventory['print_order'],
+        'rate' => $inventory['product_rate'],
+        'amount' => $inventory['product_amount'],
+        'process' => $inventory['process_id'],
+        'godown' => $inventory['godown_id'],
+        
+    ]);
+    
+    $insertPaperInventory = DB::table('inventory_tbl')->insert([
+        'batch_no' => $inventory['batch_no'],
+        'process' => $inventory['process_id'],
+        'voucher_no' => $request -> Voucher['voucher'],
+        'description' => $inventory['paper_product_id'],
+        'qtyin' => 0,
+        'qtyout' => $inventory['paper_qty'],
+        'godown' => $inventory['godown_id'],
+        'rate' => $inventory['product_rate'],
+        'amount' => $inventory['product_amount'],
+    
+    ]);
+    }
+
+    DB::commit();
+    $posResponse = $this -> get_pos($request, 'Purchase Order Press');
+    if ($posResponse->getStatusCode() == 200) 
+     $latestData = json_decode($posResponse->getContent(), true);
+     
+     return response()->json([
+        'success' => 1,
+        'pos' => $latestData['pos'],
+    
+       ]);
+
+    }
+    catch(Exception $ex){
+        DB::rollback();
+        return response()->json([
+            'success' => 0,
+            
+        
+           ]);
+    }
+    
 }
 }
